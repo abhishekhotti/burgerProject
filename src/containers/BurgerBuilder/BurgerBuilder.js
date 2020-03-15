@@ -1,59 +1,44 @@
 import React, { Component } from 'react';
 import Aux from "../../hoc/Aux";
 import Burger from "../../components/Burger/Burger";
-import Checkbox from "../../components/Checkbox/Checkbox";
-import BurgerControls from "../../components/BugerControl/BurgerControls";
+import PriceMonitor from "../../components/PriceMonitor/PriceMonitor";
+import BuildContols from '../../components/Burger/BuildControls/BuildControls';
+import ControllerContext from "../../context/burgerControllerContext";
 
 class BurgerBuilder extends Component{
     state = {
         burgerIngredients: {
-            "bread-top": [false, 1], 
-            "meat": [false, 2],
-            "cheese": [false, 3],
-            "salad": [false, 2],
-            "bacon": [false, 5],
-            "bread-bottom": [false, 1],
+            "meat": [0, 2],
+            "cheese": [0, 3],
+            "salad": [0, 2],
+            "bacon": [0, 5],
         },
+        totalPrice: 2
     }
 
-    onChangeCheckBoxHandler = (event) => {
-        let toCheckFor = null;
-        if (event.target.htmlFor !== undefined){
-            toCheckFor = event.target.htmlFor
+    controlIngredientsHandler = (event, value) => {
+        let newState = {...this.state};
+        if( event.target.innerHTML === "More"){
+            newState.burgerIngredients[value][0] = newState.burgerIngredients[value][0] + 1;
+            newState.totalPrice += newState.burgerIngredients[value][1];
         }
-        else{
-            toCheckFor = event.target.value
+        else if(this.state.burgerIngredients[value][0] > 0) {
+            newState.burgerIngredients[value][0] = newState.burgerIngredients[value][0] - 1;
+            newState.totalPrice -= newState.burgerIngredients[value][1];
         }
-        let newState = {...this.state.burgerIngredients}
-        newState[toCheckFor][0] = !newState[toCheckFor][0]
-        this.setState({burgerIngredients: newState})
+        this.setState(newState)
     }
     
     render(){
-        let totalPrice = 0
-        const ingredientsToRender = Object.keys(this.state.burgerIngredients).map(value => {
-            // console.log(this.state.burgerIngredients[value])
-            if (this.state.burgerIngredients[value][0] === true){
-                totalPrice += this.state.burgerIngredients[value][1]
-                return value
-            }
-            return null;
-        })
-        const checkBoxes = Object.keys(this.state.burgerIngredients).map((value, index) => {
-            return (
-                <Checkbox 
-                checkBoxVal = {value} 
-                key = {index}
-                checkBoxChanged = {(event) => {this.onChangeCheckBoxHandler(event)}}
-                selectBox = {this.state.burgerIngredients[value][0]}
-                />
-            )
-        });
         return (
             <Aux>
-                <Burger ingredientsToRender = {ingredientsToRender} />
-                <BurgerControls checkBoxes = {checkBoxes} priceToPay = {totalPrice}/>
-                <div>Build Controls</div>
+                <Burger 
+                ingredientsToRender = {this.state.burgerIngredients}  
+                />
+                <PriceMonitor priceToPay = {this.state.totalPrice}/>
+                <ControllerContext.Provider value={{controller: this.controlIngredientsHandler}}>
+                    <BuildContols />
+                </ControllerContext.Provider>
             </Aux>
         );
     };

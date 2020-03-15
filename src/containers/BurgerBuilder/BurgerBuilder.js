@@ -30,13 +30,24 @@ class BurgerBuilder extends Component{
     }
     
     render(){
+        let lessActive = {...this.state.burgerIngredients};
+        for(let item in lessActive){
+            lessActive[item] = lessActive[item][0] === 0
+        }
         return (
             <Aux>
                 <Burger 
-                ingredientsToRender = {this.state.burgerIngredients}  
+                    ingredientsToRender = {this.state.burgerIngredients}  
                 />
                 <PriceMonitor priceToPay = {this.state.totalPrice}/>
-                <ControllerContext.Provider value={{controller: this.controlIngredientsHandler}}>
+                <ControllerContext.Provider 
+                    value={
+                        {
+                            controller: this.controlIngredientsHandler,
+                            lessButton: lessActive
+                        }
+                    }
+                     >
                     <BuildContols />
                 </ControllerContext.Provider>
             </Aux>

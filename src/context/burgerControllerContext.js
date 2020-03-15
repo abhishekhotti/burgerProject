@@ -1,7 +1,8 @@
 import React from 'react';
 
 const controllerContext = React.createContext({
-    controller: () => {}
+    controller: () => {},
+    lessButton: {}
 });
 
 export default controllerContext;

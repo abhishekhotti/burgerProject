@@ -12,7 +12,8 @@ const controls = [
 
 const BuildContols = props => {
     return (
-        <div className = {classes.BuildContols}>
+        <div style = {{"textAlign": "center"}}>
+            <div className = {classes.BuildContols}>
             {controls.map((value, index) => {
                 return (
                     <BuildControlComponent 
@@ -22,7 +23,13 @@ const BuildContols = props => {
                     />
                 );
             })}
+            </div>
+            <button 
+            disabled = {props.purchaseButton} 
+            onClick = {props.clicked} 
+            className={classes.OrderButton}>ORDER NOW</button>
         </div>
+        
     )
 }
 

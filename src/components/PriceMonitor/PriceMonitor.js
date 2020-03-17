@@ -3,11 +3,11 @@ import React from 'react';
 
 const PriceMonitor = (props) => {
     const style = {
-        "textAlign": "center"
+        "textAlign": "center",
     }
     return (
         <div style = {style}>
-            <h1>Total Price: ${props.priceToPay}</h1>
+            <p style={{"margin": "unset"}}>Total Price: ${props.priceToPay}</p>
         </div>
     );
 }

@@ -4,6 +4,8 @@ import Burger from "../../components/Burger/Burger";
 import PriceMonitor from "../../components/PriceMonitor/PriceMonitor";
 import BuildContols from '../../components/Burger/BuildControls/BuildControls';
 import ControllerContext from "../../context/burgerControllerContext";
+import Modal from "../../components/UI/Modal/Modal";
+import OrderSummary from "../../components/Burger/OrderSummary/OrderSummary"
 
 class BurgerBuilder extends Component{
     state = {
@@ -13,7 +15,18 @@ class BurgerBuilder extends Component{
             "salad": [0, 2],
             "bacon": [0, 5],
         },
-        totalPrice: 2
+        totalPrice: 2,
+        purchasable: true,
+        showModal: false
+    }
+
+    updatePurchaseState = (newState) => {
+        const ingredientCount = Object.keys(newState.burgerIngredients).map(value => {
+            return this.state.burgerIngredients[value][0]
+        }).reduce((sum, el) => {
+            return sum + el;
+        }, 0)
+        this.setState({purchasable: ingredientCount === 0})
     }
 
     controlIngredientsHandler = (event, value) => {
@@ -27,15 +40,34 @@ class BurgerBuilder extends Component{
             newState.totalPrice -= newState.burgerIngredients[value][1];
         }
         this.setState(newState)
+        this.updatePurchaseState(newState)
+    }
+
+    showModalHandler = _ => {
+        let currModal = this.state.showModal;
+        this.setState({showModal: !currModal})
+    }
+
+    puchaseContinueHandler = () => {
+        alert("Ordered!!!")
     }
     
     render(){
+
         let lessActive = {...this.state.burgerIngredients};
         for(let item in lessActive){
             lessActive[item] = lessActive[item][0] === 0
         }
         return (
             <Aux>
+                <Modal show = {this.state.showModal} hideModal = {this.showModalHandler}>
+                    <OrderSummary 
+                    ingredients = {this.state.burgerIngredients} 
+                    cancelButtonHandler = {this.showModalHandler}
+                    acceptButtonHandler = {this.puchaseContinueHandler}
+                    totalPrice = {this.state.totalPrice}
+                    />
+                </Modal>
                 <Burger 
                     ingredientsToRender = {this.state.burgerIngredients}  
                 />
@@ -48,7 +80,7 @@ class BurgerBuilder extends Component{
                         }
                     }
                      >
-                    <BuildContols />
+                    <BuildContols purchaseButton = {this.state.purchasable} clicked = {this.showModalHandler} />
                 </ControllerContext.Provider>
             </Aux>
         );

@@ -1,5 +1,5 @@
 import React, {useContext} from 'react';
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import classes from '../BuildControlComponent/BuildControlComponent.css';
 import ControllerContext from "../../../../context/burgerControllerContext";
 
@@ -24,9 +24,8 @@ const BuildControlComponent = props => {
     )
 }
 
-BuildControlComponent.propType = {
-    ingredientName: PropType.string.isRequired,
-    buttonClick: PropType.func.isRequired
+BuildControlComponent.propTypes = {
+    ingredientName: PropTypes.string.isRequired,
 }
 
 export default BuildControlComponent;

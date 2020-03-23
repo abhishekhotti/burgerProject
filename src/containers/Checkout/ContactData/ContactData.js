@@ -3,6 +3,7 @@ import Button from "../../../components/UI/Button/Button";
 import classes from "./ContactData.css";
 import axios from "../../../axios";
 import Spinner from "../../../components/UI/Spinner/Spinner";
+import {withRouter} from "react-router-dom";
 
 class ContactData extends Component{
     state = {
@@ -40,7 +41,7 @@ class ContactData extends Component{
             this.setState({loading: false, showModal: false});
             alert("Done");
             // console.log(this.props)
-            // this.props.history.push("/");
+            this.props.history.push("/");
         })
         .catch(error => {
             console.log(error)
@@ -70,4 +71,4 @@ class ContactData extends Component{
     }
 }
 
-export default ContactData;
+export default withRouter(ContactData);

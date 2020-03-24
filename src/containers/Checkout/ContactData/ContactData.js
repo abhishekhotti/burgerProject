@@ -10,29 +10,39 @@ class ContactData extends Component{
     constructor(props){
         super(props)
         let newForm = {
-            name: this.createObjectForState("input", "text", "Your Name", ""),
-            street: this.createObjectForState("input", "text", "Your Street", ""),
-            zipCode: this.createObjectForState("input", "text", "Your ZipCode", ""),
-            country: this.createObjectForState("input", "text", "Your Country", ""),
-            email: this.createObjectForState("input", "email", "Your Email", ""),
+            name: this.createObjectForState("input", "text", "Your Name", "", "name"),
+            street: this.createObjectForState("input", "text", "Your Street", "", "street"),
+            zipCode: this.createObjectForState("input", "text", "Your ZipCode", "", "zipCode"),
+            country: this.createObjectForState("input", "text", "Your Country", "", "country"),
+            email: this.createObjectForState("input", "email", "Your Email", "", "email"),
             deliveryMethod: this.createObjectForState("select", 
                                                         [
                                                             {value: "fastest", display: "Fastest"}, 
                                                             {value: "cheapest", display: "Cheapest"}
                                                         ], 
                                                         "-- Delivery Method --", 
-                                                        "")
+                                                        "", "deliveryMethod")
         };
         this.state = {form: newForm, loading: false}
     }
-    createObjectForState = (typeOfElement, configType, placeholderForConfig, valueForElement) => {
+    createObjectForState = (typeOfElement, configType, placeholderForConfig, valueForElement, identifier) => {
         return <Input 
-            key = {placeholderForConfig}
+            key = {identifier}
             elementtype = {typeOfElement}
             value = {valueForElement}
             type = {configType}
             placeholder = {placeholderForConfig}
+            onChange = {(event) => this.onInputChangedHandler(event, identifier)}
+            name = {identifier}
         />;
+    }
+
+    onInputChangedHandler = (event, identifier) =>{
+        let newProps = {...this.state.form[identifier].props};
+        newProps = this.createObjectForState(newProps.elementtype, newProps.type, newProps.placeholder, event.target.value, identifier);
+        let newFormState = {...this.state.form};
+        newFormState[identifier] = newProps;
+        this.setState({form: newFormState})
     }
 
     submitFormHandler = (event) => {
@@ -49,7 +59,6 @@ class ContactData extends Component{
         axios.post("/orders.json", order).then(response => {
             this.setState({loading: false, showModal: false});
             alert("Done");
-            // console.log(this.props)
             this.props.history.push("/");
         })
         .catch(error => {
@@ -58,12 +67,10 @@ class ContactData extends Component{
         })
     }
 
-
     render(){
         return (
             <div className = {classes.ContactData}>
                 <h4>Enter your Contact Data</h4>
-                {/* {form} */}
                 <form>
                 {this.state.form ? Object.keys(this.state.form).map( value => this.state.form[value]) : <Spinner />}
                 <Button btnType = "Success" clicked={this.submitFormHandler}>ORDER</Button>

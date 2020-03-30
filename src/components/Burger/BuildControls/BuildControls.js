@@ -27,7 +27,7 @@ const BuildContols = props => {
             <button 
             disabled = {props.purchaseButton} 
             onClick = {props.clicked} 
-            className={classes.OrderButton}>ORDER NOW</button>
+            className={classes.OrderButton}>{props.isAuth ? "ORDER NOW" : "SIGN IN TO ORDER"}</button>
         </div>
         
     )

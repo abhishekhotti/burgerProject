@@ -8,7 +8,6 @@ const input = (props) =>{
     if (props.validity === "false" && props.touched === "true"){
         classesToAssign.push(classes.Invalid)
     }
-    console.log(props)
     switch(props.elementtype){
         case('input'):
             inputElement = <input 
@@ -22,7 +21,7 @@ const input = (props) =>{
             break;
         case('select'):
             inputElement = (
-                <select disabled
+                <select
                     className = {classes.InputElement} 
                     {...props}>
                     {props.type.map((option) => (

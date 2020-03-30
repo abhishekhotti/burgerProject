@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import Button from "../../../components/UI/Button/Button";
 import classes from "./ContactData.css";
-import axios from "../../../axios";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import {withRouter} from "react-router-dom";
 import Input from "../../../components/UI/Input/Input";
+import {connect} from 'react-redux';
+import * as actions from "../../../store/actions/index";
 
 class ContactData extends Component{
     constructor(props){
@@ -21,7 +22,7 @@ class ContactData extends Component{
                                                             {value: "cheapest", display: "Cheapest"}
                                                         ], 
                                                         "-- Delivery Method --", 
-                                                        "", "deliveryMethod", false, false), required:{valid: true}}
+                                                        "fastest", "deliveryMethod", false, false), required:{valid: true}}
         };
         this.state = {form: newForm, loading: false, wholeForm: false}
     }
@@ -64,27 +65,29 @@ class ContactData extends Component{
 
     submitFormHandler = (event) => {
         event.preventDefault();
-        this.setState({loading: true})
-        const contactInfo = Object.keys(this.state.form).reduce((combinedDict ,value) => {
-            return {...combinedDict, [value]: this.state.form[value].props.value}
+        const contactInfo = Object.keys(this.state.form).reduce((combinedDict ,item) => {
+
+            return {...combinedDict, [item]: this.state.form[item].inputObject.props.value}
         }, {});
         const order = {
-            ingredients: Object.keys(this.props.burgerIngredients).reduce((newObj, currVal) => 
+            ingredients: Object.keys(this.props.ingredientsFromStore).reduce((newObj, currVal) => 
                 {
-                    return {...newObj, [currVal]: this.props.burgerIngredients[currVal][0]}
+                    return {...newObj, [currVal]: this.props.ingredientsFromStore[currVal][0]}
                 }, {}),
-            price: this.props.totalPrice,
-            contactInfo: contactInfo
+            price: this.props.priceFromStore,
+            contactInfo: contactInfo,
+            userId: this.props.token
         }
-        axios.post("/orders.json", order).then(response => {
-            this.setState({loading: false, showModal: false});
-            alert("Done");
-            this.props.history.push("/");
-        })
-        .catch(error => {
-            console.log(error)
-            this.setState({loading: false, showModal: false});
-        })
+        this.props.onOrderBurger(order, this.props.token)
+        // axios.post("/orders.json", order).then(response => {
+        //     this.setState({loading: false, showModal: false});
+        //     alert("Done");
+        //     this.props.history.push("/");
+        // })
+        // .catch(error => {
+        //     console.log(error)
+        //     this.setState({loading: false, showModal: false});
+        // })
     }
 
     render(){
@@ -98,7 +101,6 @@ class ContactData extends Component{
                 <h4>Enter your Contact Data</h4>
                 <form onSubmit = {this.submitFormHandler}>
                 {this.state.form ? Object.keys(this.state.form).map( value => this.state.form[value].inputObject) : <Spinner />}
-                {/* <Button btnType = "Success" clicked={this.submitFormHandler}>ORDER</Button> */}
                 <Button activate = {!checkFormState} btnType = "Success" >ORDER</Button>
                 </form>
             </div>
@@ -106,4 +108,19 @@ class ContactData extends Component{
     }
 }
 
-export default withRouter(ContactData);
+const mapStateToProps = state => {
+    return {
+        ingredientsFromStore: state.burgerBuilder.ingredients,
+        priceFromStore: state.burgerBuilder.totalPrice,
+        loading: state.order.loading,
+        token: state.authReducer.token
+    };
+}
+
+const mapDispatchToProps = dispatch => {
+    return {
+        onOrderBurger: (orderData, token) => dispatch(actions.purchaseBurger(orderData, token))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withRouter(ContactData));

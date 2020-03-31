@@ -12,7 +12,7 @@ class Orders extends Component{
 
     componentDidMount(){
         let allOrders = null;
-        const queryParam = "?auth="+this.props.token+"&orderBy=\"userId\"&equalTo=\""+this.props.token+"\"";
+        const queryParam = "?auth="+this.props.token+"&orderBy=\"userId\"&equalTo=\""+this.props.userId+"\"";
         axios.get("/orders.json"+queryParam).then(response => {
             allOrders = Object.keys(response.data).map(value => {
                 let priceForOrder = response.data[value].price;
@@ -55,7 +55,8 @@ class Orders extends Component{
 
 const mapStateToProps = state => {
     return {
-        token: state.authReducer.token
+        token: state.authReducer.token,
+        userId: state.authReducer.userId
     }
 }
 
